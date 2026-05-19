@@ -218,6 +218,8 @@ This implementation accompanies the following working paper:
 - **DOI:** [10.13140/RG.2.2.33961.76641](https://doi.org/10.13140/RG.2.2.33961.76641)
 - **License:** CC BY 4.0
 - **Published:** April 9, 2026
+- **SSRN:** https://ssrn.com/abstract=6667278
+- **SSRN Abstract ID:** 6667278 (posted May 8, 2026)
 
 ---
 
