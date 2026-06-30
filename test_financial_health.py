@@ -56,6 +56,22 @@ TEST_CASES = [
                         "defers to Layers 1-3 (sanctions/geo/industry/ownership) "
                         "rather than guessing.",
     },
+    {
+        "name": "Bed Bath & Beyond Inc.",
+        "cik": "886158",
+        "expectation": (
+            "TRUE POSITIVE CASE — Bed Bath & Beyond filed for Chapter 11 "
+            "bankruptcy on April 23, 2023. Independent financial reporting "
+            "confirms shareholders' equity of approximately -$2.8 billion "
+            "against total assets of approximately $2.2 billion in its final "
+            "reporting period — a genuine, severe financial distress signal "
+            "(equity eroded from +$2.72 billion in FY2017 to deeply negative "
+            "by FY2022), unlike the Domino's buyback case above. Expect this "
+            "module to correctly flag HIGH/CRITICAL risk on a real distress "
+            "event, demonstrating the module catches genuine cases, not just "
+            "the false-positive edge case."
+        ),
+    },
 ]
 
 
