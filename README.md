@@ -27,9 +27,9 @@ Current U.S. vendor vetting methodologies share three critical failures:
 2. **Siloed data sources** — risk signals across corporate registries, sanctions databases, and logistics records are never analyzed together
 3. **Binary outputs** — pass/fail classification provides no probabilistic nuance for procurement decision-makers
 
-The [2020 SolarWinds compromise](https://www.cisa.gov/news-events/alerts/2020/12/17/active-exploitation-solarwinds-software) demonstrated that a single compromised vendor relationship can cascade into breaches affecting hundreds of federal agencies.
+The [2020 SolarWinds compromise](https://www.cisa.gov/news-events/alerts/2020/12/17/active-exploitation-solarwinds-software) demonstrated the scale of vendor risk: approximately 18,000 organizations downloaded the compromised update, and nine U.S. federal agencies were confirmed breached.
 
-**Policy alignment:** V.E.T. directly addresses requirements under [Executive Order 13873](https://www.federalregister.gov/documents/2019/05/17/2019-10538/securing-the-information-and-communications-technology-and-services-supply-chain) (ICT Supply Chain Security), [NIST SP 800-161 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final), and the [FinCEN Beneficial Ownership Rule](https://www.fincen.gov/boi) (31 C.F.R. §1010.380, effective January 2024).
+**Policy alignment:** V.E.T. directly addresses requirements under [Executive Order 13873](https://www.federalregister.gov/documents/2019/05/17/2019-10538/securing-the-information-and-communications-technology-and-services-supply-chain) (ICT Supply Chain Security), [NIST SP 800-161 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final), and the [FinCEN Beneficial Ownership Information reporting framework](https://www.fincen.gov/boi) (90 FR 13688, March 26, 2025).
 
 ---
 
@@ -38,13 +38,13 @@ The [2020 SolarWinds compromise](https://www.cisa.gov/news-events/alerts/2020/12
 V.E.T. uses a four-layer data fusion architecture:
 
 ```
-┌─────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────┐
 │  Layer 1: Data Ingestion & Normalization                │
 │  Corporate registries · Sanctions (OFAC/BIS/CAATSA)    │
 │  FinCEN BOI · Logistics APIs · OSINT feeds              │
 └──────────────────────┬──────────────────────────────────┘
                        │
-┌──────────────────────▼──────────────────────────────────┐
+┌─────────────────────▼──────────────────────────────────┐
 │  Layer 2: Entity Resolution & Knowledge Graph           │
 │  Fuzzy name matching · Ownership chain traversal        │
 │  Cross-jurisdictional entity deduplication              │
@@ -82,19 +82,19 @@ vet-vendor-threat-detection/
 │   ├── __init__.py
 │   ├── config.py                # Configuration management
 │   │
-│   ├── ingestion/               # Layer 1: Data ingestion
+│   ├── ingestion/              # Layer 1: Data ingestion
 │   │   ├── __init__.py
 │   │   ├── sanctions_loader.py  # OFAC, BIS Entity List, CAATSA
 │   │   ├── registry_loader.py   # Corporate registry data
 │   │   ├── boi_loader.py        # FinCEN BOI data connector
-│   │   └── osint_loader.py      # Open-source intelligence feeds
+▾   │   └── osint_loader.py      # Open-source intelligence feeds
 │   │
 │   ├── resolution/              # Layer 2: Entity resolution
 │   │   ├── __init__.py
 │   │   ├── entity_resolver.py   # Fuzzy matching & deduplication
-│   │   └── graph_builder.py     # Knowledge graph construction
+│   │   └── graph_builder.py    # Knowledge graph construction
 │   │
-│   ├── features/                # Layer 3: Feature engineering
+│   ├── features/               # Layer 3: Feature engineering
 │   │   ├── __init__.py
 │   │   ├── sanctions_features.py
 │   │   ├── financial_features.py
@@ -106,25 +106,25 @@ vet-vendor-threat-detection/
 │   │   ├── anomaly_detector.py  # Isolation Forest
 │   │   └── risk_scorer.py       # Final risk tier output
 │   │
-│   └── api/                     # REST API interface
+│   └── api/                    # REST API interface
 │       ├── __init__.py
 │       └── endpoints.py         # FastAPI endpoints
 │
-├── data/                        # Sample data (public sources only)
+├── data/                      # Sample data (public sources only)
 │   ├── sample_entities.csv      # Anonymized test entities
 │   └── sanctions_snapshot/      # Public OFAC SDN list sample
 │
-├── notebooks/                   # Jupyter exploration notebooks
+├── notebooks/                  # Jupyter exploration notebooks
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_entity_resolution_demo.ipynb
 │   └── 03_risk_scoring_demo.ipynb
 │
-├── tests/                       # Unit tests
+├── tests/                     # Unit tests
 │   ├── test_sanctions_loader.py
 │   ├── test_entity_resolver.py
 │   └── test_risk_scorer.py
 │
-└── docs/                        # Documentation
+└── docs/                       # Documentation
     ├── architecture.md
     ├── data_sources.md
     └── policy_alignment.md
@@ -188,7 +188,7 @@ V.E.T. integrates six primary data domains:
 |--------|--------|--------|
 | Sanctions lists | OFAC SDN, BIS Entity List, CAATSA, UN SC | Public |
 | Corporate registries | OpenCorporates API, state registries | Public API |
-| Beneficial ownership | FinCEN BOI (post-Jan 2024) | Restricted* |
+| Beneficial ownership | FinCEN BOI (per 90 FR 13688, March 2025) | Restricted* |
 | Financial patterns | Commercial financial health APIs | Commercial |
 | Logistics/shipping | CBP import records, maritime APIs | Public + Commercial |
 | OSINT | Adverse media, domain registration | Public |
@@ -204,7 +204,7 @@ V.E.T. integrates six primary data domains:
 | EO 13873 — ICT Supply Chain | AI-automated adversarial vendor detection |
 | NIST SP 800-161 Rev. 1 | Continuous risk scoring + evidence chain |
 | FAR 4.21 | Beneficial ownership cross-reference |
-| FinCEN BOI Rule (2024) | BOI data integration in entity graph |
+| FinCEN BOI Rule (90 FR 13688, March 2025) | BOI data integration in entity graph |
 | CHIPS Act §9902 | Semiconductor supply chain screening |
 
 ---
@@ -228,9 +228,9 @@ This implementation accompanies the following working paper:
 **Arthunya Kanoklertwongse**
 M.S. Computer Science (AI Concentration) — Westcliff University, San Francisco
 MSc Financial Technology (Merit, academic merit scholarship) — University of the West of England, Bristol
-14 years: Financial analysis · KYC/AML compliance · Enterprise operations
+14 years: Financial analysis · Vendor risk management · Enterprise operations
 
-**Background:** The V.E.T. framework draws on 14 years of practitioner experience in financial crime detection and KYC/AML compliance — translated into a machine-learnable architecture through graduate-level AI research. The feature engineering design reflects analytical heuristics developed through years of manual financial due diligence at YLG Bullion Group (Singapore/Malaysia) and ASUSTeK Computer (Thailand).
+**Background:** The V.E.T. framework draws on 14 years of practitioner experience in financial analysis and vendor risk management — translated into a machine-learnable architecture through graduate-level AI research. The feature engineering design reflects analytical heuristics developed through years of professional experience in financial services and enterprise vendor evaluation.
 
 ---
 
