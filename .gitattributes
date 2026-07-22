@@ -1,0 +1,12 @@
+# Mark generated/data files so GitHub's language detector (linguist)
+# doesn't count them as hand-written source. Without this, the large
+# self-contained dashboard HTML (with embedded data) skews the repo's
+# reported language mix away from Python, which is the actual research
+# implementation language.
+
+dashboard/VET_Dashboard.html linguist-generated=true
+dashboard/vet_dashboard_template.html linguist-generated=true
+data_build/vet_db.json linguist-generated=true
+data_build/sp500.csv linguist-generated=true
+data_build/nasdaq.csv linguist-generated=true
+eval/results_latest.json linguist-generated=true

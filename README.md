@@ -6,6 +6,7 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![ResearchGate DOI](https://img.shields.io/badge/DOI-10.13140%2FRG.2.2.33961.76641-blue)](https://doi.org/10.13140/RG.2.2.33961.76641)
 [![Status: Active Development](https://img.shields.io/badge/Status-Active%20Development-green.svg)](#project-status)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Dashboard-orange.svg)](https://arthunya.github.io/vet-vendor-threat-detection/dashboard/VET_Dashboard.html)
 
 Repository created April 2026 · actively maintained.
 
@@ -29,7 +30,7 @@ Current U.S. vendor vetting methodologies share three critical failures:
 2. **Siloed data sources** — risk signals across corporate registries, sanctions databases, and logistics records are never analyzed together
 3. **Binary outputs** — pass/fail classification provides no probabilistic nuance for procurement decision-makers
 
-The [2020 SolarWinds compromise](https://www.cisa.gov/news-events/alerts/2020/12/17/active-exploitation-solarwinds-software) demonstrated the scale of vendor risk: approximately 18,000 organizations downloaded the compromised update, and nine U.S. federal agencies were confirmed breached.
+The [2020 SolarWinds compromise](https://www.cisa.gov/news-events/cybersecurity-advisories/aa20-352a) demonstrated the scale of vendor risk: approximately 18,000 organizations downloaded the compromised update, and nine U.S. federal agencies were confirmed breached.
 
 **Policy alignment:** V.E.T. directly addresses requirements under [Executive Order 13873](https://www.federalregister.gov/documents/2019/05/17/2019-10538/securing-the-information-and-communications-technology-and-services-supply-chain) (ICT Supply Chain Security), [NIST SP 800-161 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final), and the [FinCEN Beneficial Ownership Information reporting framework](https://www.fincen.gov/boi) (90 FR 13688, March 26, 2025).
 
@@ -255,7 +256,7 @@ Rebuild: `python scripts/build_company_db.py && python scripts/assemble_dashboar
 ### Live Demo
 
 GitHub does not render HTML files inline. To view the dashboard without downloading:
-- **GitHub Pages** (once enabled in repo Settings → Pages): `https://arthunya.github.io/vet-vendor-threat-detection/dashboard/VET_Dashboard.html`
+- **[Open the live interactive dashboard →](https://arthunya.github.io/vet-vendor-threat-detection/dashboard/VET_Dashboard.html)** (hosted via GitHub Pages)
 
 ---
 
