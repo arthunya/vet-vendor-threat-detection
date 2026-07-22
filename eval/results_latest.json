@@ -1,0 +1,246 @@
+{
+  "benchmark": "v0-seed (n=33 real entities)",
+  "evaluated_at": "2026-07-07T00:30:19.229236+00:00",
+  "model_version": "1e0b3ea",
+  "confusion": {
+    "TP": 17,
+    "FP": 0,
+    "FN": 0,
+    "TN": 16
+  },
+  "precision_high_critical": 1.0,
+  "recall_high_critical": 1.0,
+  "results": [
+    {
+      "name": "Huawei Technologies Co., Ltd.",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "Semiconductor Manufacturing International Corporation",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "Hangzhou Hikvision Digital Technology Co., Ltd.",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "Zhejiang Dahua Technology Co., Ltd.",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "Megvii Technology Limited",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "iFLYTEK Co., Ltd.",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "Kalashnikov Concern",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Almaz-Antey",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Rosoboronexport OAO",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Sberbank of Russia",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "VTB Bank Public Joint Stock Company",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "PMC Wagner",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Mahan Air",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Islamic Republic of Iran Shipping Lines",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Bank Melli Iran",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Korea Mining Development Trading Corporation",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.6647,
+      "critical_override": true
+    },
+    {
+      "name": "Garantex Europe OU",
+      "ground_truth": "HIGH",
+      "predicted_tier": "CRITICAL",
+      "composite": 0.5059,
+      "critical_override": true
+    },
+    {
+      "name": "Apple Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Microsoft Corporation",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Cisco Systems, Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Intel Corporation",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Honeywell International Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "FedEx Corporation",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "United Parcel Service, Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Oracle Corporation",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "International Business Machines Corporation",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Caterpillar Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Deere & Company",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Texas Instruments Incorporated",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "The Procter & Gamble Company",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Johnson & Johnson",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "PepsiCo, Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.0,
+      "critical_override": false
+    },
+    {
+      "name": "Domino's Pizza, Inc.",
+      "ground_truth": "LOW",
+      "predicted_tier": "LOW",
+      "composite": 0.12,
+      "critical_override": false
+    }
+  ]
+}

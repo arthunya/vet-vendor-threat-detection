@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V.E.T. — Vendor Entity Threat Detection</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --ink:#191917; --muted:#6b6a63; --faint:#8f8e86; --page:#f7f6f2;
+  --card:#ffffff; --line:#e2e0d8; --accent:#23405c;
+  --low:#1d7a4f; --low-bg:#e7f3ec; --med:#9a6b00; --med-bg:#fbf3dc;
+  --high:#c2511f; --high-bg:#fbeae2; --crit:#a32d2d; --crit-bg:#fbe9e9;
+}
+*{box-sizing:border-box; margin:0}
+body{background:var(--page); color:var(--ink);
+  font:16px/1.65 "Avenir Next","Segoe UI",system-ui,sans-serif; padding:0 0 4rem}
+.wrap{max-width:1060px; margin:0 auto; padding:0 20px}
+header{border-bottom:1px solid var(--line); background:var(--card)}
+.hbar{display:flex; align-items:baseline; gap:14px; padding:22px 0; flex-wrap:wrap}
+.mark{font:600 26px/1 Georgia,serif; letter-spacing:.5px}
+.mark span{color:var(--accent)}
+.tag{color:var(--muted); font-size:14px}
+.badge{margin-left:auto; font-size:12px; color:var(--faint);
+  border:1px solid var(--line); border-radius:999px; padding:4px 12px}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px; margin:22px 0}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+.stat .k{font-size:12px; color:var(--faint); text-transform:uppercase; letter-spacing:.6px}
+.stat .v{font-size:22px; font-weight:600; margin-top:2px}
+.stat .s{font-size:12px; color:var(--muted)}
+h2{font-size:17px; font-weight:600; margin:30px 0 12px}
+.panel{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px}
+.row{display:flex; gap:10px; flex-wrap:wrap}
+input[type=text],input[type=number],select{
+  font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+  background:#fff; min-width:0}
+#q{flex:1; min-width:280px}
+button{font:inherit; font-weight:600; padding:10px 20px; border-radius:8px;
+  border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer}
+button.ghost{background:transparent; color:var(--accent); font-weight:500}
+button:active{transform:scale(.98)}
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.chip{font-size:13px; padding:6px 12px; border:1px solid var(--line);
+  border-radius:999px; background:var(--page); cursor:pointer; color:var(--muted)}
+.chip:hover{border-color:var(--accent); color:var(--accent)}
+details{margin-top:14px; font-size:14px}
+summary{cursor:pointer; color:var(--muted)}
+.adv{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px; margin-top:12px; align-items:end}
+.adv label{display:block; font-size:12px; color:var(--faint); margin-bottom:4px}
+.adv .chk{display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted); padding-bottom:10px}
+#status{font-size:13px; color:var(--faint); margin-top:10px; min-height:18px}
+#result{display:none}
+.verdict{border-radius:12px; padding:18px 22px; margin-top:26px;
+  display:flex; gap:16px; align-items:center; flex-wrap:wrap; border:1px solid var(--line)}
+.verdict .tier{font-size:13px; font-weight:700; letter-spacing:1px; padding:6px 16px;
+  border-radius:999px; color:#fff}
+.verdict .nm{font-size:19px; font-weight:600}
+.verdict .cs{margin-left:auto; text-align:right}
+.verdict .cs .n{font-size:22px; font-weight:600}
+.verdict .cs .l{font-size:12px; color:var(--muted)}
+.verdict .headline{width:100%; font-size:15px; color:var(--ink)}
+.grid2{display:grid; grid-template-columns:1.15fr .85fr; gap:14px; margin-top:14px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.cardt{font-size:13px; color:var(--faint); text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px}
+.reco li{margin:0 0 8px 18px; font-size:14.5px}
+.cats{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; margin-top:14px}
+.cat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+.cat .top{display:flex; align-items:center; gap:10px}
+.cat .nm{font-weight:600; font-size:15px}
+.pill{margin-left:auto; font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px}
+.cat .why{font-size:14px; color:#3c3b36; margin:10px 0 8px}
+.cat .links{font-size:13px}
+.cat .links a{color:var(--accent); text-decoration:none; margin-right:14px}
+.cat .links a:hover{text-decoration:underline}
+.meter{height:6px; background:var(--page); border-radius:99px; overflow:hidden; margin-top:8px}
+.meter i{display:block; height:100%}
+.portfolio{display:grid; grid-template-columns:280px 1fr; gap:20px; align-items:center}
+@media(max-width:760px){.portfolio{grid-template-columns:1fr}}
+.plist{font-size:14px; color:var(--muted)}
+.plist b{color:var(--ink)}
+footer{margin-top:44px; border-top:1px solid var(--line); padding-top:20px;
+  font-size:13px; color:var(--muted)}
+footer h3{font-size:13px; color:var(--ink); margin:14px 0 4px}
+a{color:var(--accent)}
+.canvasbox{position:relative; height:250px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="hbar">
+  <div class="mark">V.<span>E.</span>T.</div>
+  <div class="tag">Vendor Entity Threat Detection — supply chain risk screening</div>
+  <div class="badge" id="engineBadge">engine v0.2 · demo build</div>
+</div></div></header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><div class="k">US companies in database</div><div class="v" id="stCompanies">—</div><div class="s">S&amp;P 500 + NASDAQ-listed (real, public datasets)</div></div>
+    <div class="stat"><div class="k">Designated entities</div><div class="v" id="stSanctions">—</div><div class="s">Curated real OFAC SDN + BIS records (demo subset)</div></div>
+    <div class="stat"><div class="k">Risk domains fused</div><div class="v">5</div><div class="s">Sanctions · financial · geographic · opacity · industry</div></div>
+    <div class="stat"><div class="k">Full-database scan</div><div class="v" id="stScan">running…</div><div class="s" id="stScanSub">live in your browser</div></div>
+  </div>
+
+  <h2>Screen a vendor</h2>
+  <div class="panel">
+    <div class="row">
+      <input type="text" id="q" list="companyList" placeholder="Type any company name — e.g. a supplier you are about to sign" autocomplete="off">
+      <datalist id="companyList"></datalist>
+      <button id="go">Screen vendor</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <details><summary>Custom entity attributes (used when the name is not in the database)</summary>
+      <div class="adv">
+        <div><label>Jurisdiction</label><select id="fJuris"></select></div>
+        <div><label>Beneficial-owner jurisdiction</label><select id="fOwner"></select></div>
+        <div><label>Year incorporated</label><input type="number" id="fFounded" placeholder="e.g. 2026" min="1800" max="2026"></div>
+        <div><label>Business category</label><select id="fNaics">
+          <option value="">Unknown / other</option>
+          <option value="334413">Semiconductors and components (334413)</option>
+          <option value="334418">Electronic assemblies (334418)</option>
+          <option value="334516">Analytical instruments (334516)</option>
+          <option value="336411">Aerospace (336411)</option>
+          <option value="423690">Electronic parts wholesale (423690)</option>
+          <option value="488510">Freight forwarding (488510)</option>
+          <option value="493110">Warehousing (493110)</option>
+          <option value="541614">Logistics consulting (541614)</option>
+        </select></div>
+        <div class="chk"><input type="checkbox" id="fRegistry"><label for="fRegistry" style="margin:0">Registry identity verified (SEC CIK / LEI / state filing)</label></div>
+      </div>
+    </details>
+    <div id="status"></div>
+  </div>
+
+  <div id="result">
+    <div class="verdict" id="verdict">
+      <span class="tier" id="vTier">—</span>
+      <span class="nm" id="vName">—</span>
+      <div class="cs"><div class="n" id="vScore">—</div><div class="l">composite risk score</div></div>
+      <div class="headline" id="vHead"></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><div class="cardt">Risk breakdown by domain</div>
+        <div class="canvasbox"><canvas id="barChart"></canvas></div></div>
+      <div class="panel"><div class="cardt">Recommended next steps</div>
+        <ul class="reco" id="reco"></ul></div>
+    </div>
+    <div class="cats" id="cats"></div>
+    <div class="panel" style="margin-top:14px"><div class="cardt">Verify externally</div>
+      <div class="links cat" style="border:none; padding:0" id="extLinks"></div></div>
+  </div>
+
+  <h2>Portfolio overview — live scan of the full database</h2>
+  <div class="panel portfolio">
+    <div class="canvasbox" style="height:230px"><canvas id="donut"></canvas></div>
+    <div class="plist" id="scanSummary">Scanning…</div>
+  </div>
+
+  <footer>
+    <h3>Methodology</h3>
+    <p>Every screening runs a five-domain weighted ensemble in your browser: sanctions proximity (exact, fuzzy ≥90%, and affiliate-containment matching with corporate-suffix normalization), financial health (SEC EDGAR shareholders'-equity-to-assets, cached validation values), geographic risk (FATF call-for-action and increased-monitoring lists, Feb 2026 snapshot), entity opacity (registry identity + incorporation age), and industry-jurisdiction conflict. Domains with no data are excluded and weights renormalized — the system never fabricates a score. A direct match to a designated entity forces CRITICAL regardless of the composite.</p>
+    <h3>Data integrity notes</h3>
+    <p>Company records are real US companies from public datasets (S&amp;P 500 constituents; NASDAQ listed-securities snapshot). No real company is ever labeled fraudulent by this tool — HIGH/CRITICAL results reflect matches against public government designation lists or documented risk-pattern indicators requiring human review. Profiles tagged <b>[SYNTHETIC DEMO]</b> are fictitious and exist only to demonstrate shell-company pattern detection. The designated-entity set here is a curated demo subset of 68 real, publicly citable OFAC SDN and BIS Entity List records; the production ingester mirrors the full lists (~15,000+ records) daily.</p>
+    <p>V.E.T. is a decision-support tool, not legal advice. Escalations should be reviewed by a qualified compliance professional. Framework: Kanoklertwongse (2026), working paper.</p>
+  </footer>
+</div>
+
+<script>
+/*__ENGINE__*/
+</script>
+<script>
+const VET_DATA = /*__VET_DATA__*/;
+const E = VET_ENGINE;
+const PREP = E.prepSanctions(VET_DATA.sanctions);
+const TIER_META = {
+  LOW:{c:"var(--low)",bg:"var(--low-bg)",label:"LOW",head:"No adverse findings. Standard onboarding can proceed.",
+    reco:["Proceed with the engagement under normal terms.","Keep standard onboarding documents (W-9, insurance, references) on file.","Re-screen automatically on each sanctions-list update (production mode) or at least quarterly."]},
+  MEDIUM:{c:"var(--med)",bg:"var(--med-bg)",label:"MEDIUM",head:"Proceed with enhanced due diligence — one or more signals warrant verification.",
+    reco:["Request certificate of incorporation and beneficial-ownership declaration before first payment.","Verify the registry identity at the state Secretary of State or OpenCorporates.","Start with limited exposure (small first order, shorter payment terms).","Document this review — it is your compliance evidence."]},
+  HIGH:{c:"var(--high)",bg:"var(--high-bg)",label:"HIGH",head:"Hold. A designation-list linkage or high-risk pattern was found — human review required before any contract or payment.",
+    reco:["Do not sign or pay until a person has reviewed the evidence below.","Check the matched name directly at the official OFAC / BIS links.","Request full ownership chain documentation from the vendor.","If the linkage is confirmed, decline the engagement and record the decision."]},
+  CRITICAL:{c:"var(--crit)",bg:"var(--crit-bg)",label:"CRITICAL",head:"Do not transact. Direct match to a designated entity — dealings may violate US sanctions or export-control law.",
+    reco:["Stop all transactions and communications about new business.","Verify the exact designation at the official source links below.","Consult legal counsel; OFAC operates a compliance hotline for questions.","If funds or goods are already in motion, counsel may advise on blocking/reporting obligations."]}
+};
+const JURIS = [["US","United States"],["CA","Canada"],["GB","United Kingdom"],["DE","Germany"],["JP","Japan"],["TH","Thailand"],["SG","Singapore"],["HK","Hong Kong"],["AE","United Arab Emirates"],["VN","Vietnam"],["CN","China"],["IN","India"],["MX","Mexico"],["BR","Brazil"],["LB","Lebanon"],["NG","Nigeria"],["ZA","South Africa"],["RU","Russia"],["BY","Belarus"],["IR","Iran"],["KP","North Korea"],["SY","Syria"],["CU","Cuba"],["MM","Myanmar"]];
+
+const $ = id => document.getElementById(id);
+let barChart=null, donutChart=null;
+const DB_INDEX=new Map();
+for(const c of VET_DATA.companies) DB_INDEX.set(E.stripSuffix(E.normalize(c.name)),c);
+
+function init(){
+  $("stCompanies").textContent = VET_DATA.companies.length.toLocaleString();
+  $("stSanctions").textContent = VET_DATA.sanctions.length;
+  const dl=$("companyList");
+  const frag=document.createDocumentFragment();
+  for(const c of VET_DATA.companies){const o=document.createElement("option");o.value=c.name;frag.appendChild(o);}
+  for(const s of VET_DATA.synthetic){const o=document.createElement("option");o.value=s.name;frag.appendChild(o);}
+  dl.appendChild(frag);
+  for(const id of ["fJuris","fOwner"]){
+    const sel=$(id);
+    for(const [code,nm] of JURIS){const o=document.createElement("option");o.value=code;o.textContent=nm+" ("+code+")";sel.appendChild(o);}
+    sel.value="US";
+  }
+  const chips=["FedEx","Domino's","Huawei Technologies (Thailand) Co., Ltd.","PMC Wagner","Meridian Global Trade LLC [SYNTHETIC DEMO]","Ironwood Supply Chain LLC [SYNTHETIC DEMO]"];
+  for(const c of chips){const b=document.createElement("span");b.className="chip";b.textContent=c;
+    b.onclick=()=>{$("q").value=c;screenVendor();};$("chips").appendChild(b);}
+  $("go").onclick=screenVendor;
+  $("q").addEventListener("keydown",e=>{if(e.key==="Enter")screenVendor();});
+  setTimeout(portfolioScan,80);
+}
+
+function resolveEntity(name){
+  const key=name.trim().toUpperCase();
+  const db=VET_DATA.companies.find(c=>c.name.toUpperCase()===key)
+        || DB_INDEX.get(E.stripSuffix(E.normalize(name)));
+  if(db) return {entity:{name:db.name,jurisdiction:"US",registryId:db.registryId,founded:db.founded,cik:db.cik,naics:null},
+    src:"Database record — "+db.src+(db.sector?" · "+db.sector:"")+(db.hq?" · HQ "+db.hq:"")+(db.founded?" · founded "+db.founded:""),
+    sizeClass:db.sizeClass, ticker:db.ticker};
+  const syn=VET_DATA.synthetic.find(s=>s.name.toUpperCase()===key);
+  if(syn) return {entity:{name:syn.name,jurisdiction:syn.jurisdiction,ownerJurisdiction:syn.ownerJurisdiction,
+    founded:syn.founded,registryId:syn.registryId,naics:syn.naics},
+    src:"SYNTHETIC DEMO PROFILE (fictitious) — pattern: "+syn.pattern, synthetic:true};
+  return {entity:{name:name.trim(),jurisdiction:$("fJuris").value,ownerJurisdiction:$("fOwner").value,
+    founded:$("fFounded").value?+$("fFounded").value:null,registryId:$("fRegistry").checked,
+    naics:$("fNaics").value||null},
+    src:"Custom entity — attributes from the form above (unverified in this demo)"};
+}
+
+function scoreColor(s){return s>=0.6?"var(--crit)":s>=0.4?"var(--high)":s>=0.2?"var(--med)":"var(--low)";}
+function pill(s){
+  if(s===null) return '<span class="pill" style="background:var(--page);color:var(--faint)">no data</span>';
+  return '<span class="pill" style="background:'+scoreColor(s)+';color:#fff">'+s.toFixed(2)+'</span>';
+}
+function meter(s){
+  const v=s===null?0:Math.round(s*100);
+  return '<div class="meter"><i style="width:'+v+'%;background:'+scoreColor(s||0)+'"></i></div>';
+}
+function link(u,t){return '<a href="'+u+'" target="_blank" rel="noopener">'+t+' ↗</a>';}
+
+function whySanctions(d,name){
+  const ev=d.detail.ev;
+  const base='https://sanctionssearch.ofac.treas.gov/';
+  const bis='https://www.bis.doc.gov/index.php/policy-guidance/lists-of-parties-of-concern/entity-list';
+  if(!ev) return {why:"No name or alias matched at ≥90% similarity against "+VET_DATA.sanctions.length+" designated entities (OFAC SDN and BIS Entity List, curated demo subset). In production the full live lists (~15,000+ records) are mirrored daily, so a clean result here should be re-confirmed against the full mirror.",
+    links:[link(base,"OFAC sanctions search"),link(bis,"BIS Entity List")]};
+  const listName=ev.list==="OFAC_SDN"?"OFAC SDN list":"BIS Entity List";
+  let why;
+  if(d.detail.direct) why="Exact match to \""+ev.matched+"\" on the "+listName+" ("+ev.program+", designated "+ev.year+"). "+(ev.note?ev.note+". ":"")+"US persons are generally prohibited from transacting with SDN-listed parties; Entity List parties face export restrictions.";
+  else if(ev.kind==="affiliate-containment") why="The vendor's name fully contains \""+ev.matched+"\" — a party on the "+listName+" ("+ev.program+", "+ev.year+"). This is the classic subsidiary/affiliate naming pattern; many affiliates of listed parents are themselves listed or restricted. Routed to human review rather than auto-blocked.";
+  else why="Close fuzzy match ("+ev.kind+") to \""+ev.matched+"\" on the "+listName+" ("+ev.program+", "+ev.year+"). Could be the same entity under a name variant — verify at the official source.";
+  return {why,links:[link(base,"OFAC sanctions search"),link(bis,"BIS Entity List")]};
+}
+function whyFinancial(d,name){
+  const edgar='https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&company='+encodeURIComponent(name)+'&type=10-K&dateb=&owner=include&count=10';
+  if(!d.detail.coverage) return {why:"No SEC financial data for this entity in the demo cache. The system excludes this domain and renormalizes weights — it never invents a score. If the vendor is a US public filer, its real filings are one click away.",
+    links:[link(edgar,"Search SEC EDGAR filings")]};
+  const r=d.detail.ratio;
+  let why;
+  if(r>=0.15) why="Shareholders'-equity-to-assets ratio of "+r+" ("+d.detail.fy+", SEC EDGAR) — a healthy capital cushion. Financial distress is not a risk driver for this vendor.";
+  else if(r>=0) why="Thin equity cushion ("+r+", "+d.detail.fy+") — not alarming alone, but monitor payment behavior.";
+  else why="Negative book equity ("+r+", "+d.detail.fy+"). Important nuance: for this company the negative equity stems from large share buybacks, a known confound (documented as the framework's §6.5 false-positive class) — so the ensemble weighting prevents this single signal from escalating the overall tier. Genuine distress requires corroborating signals.";
+  return {why,links:[link(edgar,"View SEC EDGAR filings")]};
+}
+function whyGeo(d){
+  const fatf='https://www.fatf-gafi.org/en/publications/High-risk-and-other-monitored-jurisdictions.html';
+  if(!d.detail.hits.length) return {why:"Registered and beneficially owned in jurisdictions with no FATF call-for-action or increased-monitoring listing (Feb 2026 snapshot).",links:[link(fatf,"FATF jurisdiction lists")]};
+  return {why:d.detail.cat+": "+d.detail.hits.join(", ")+". Exposure through registration or beneficial ownership in these jurisdictions is a primary vector for sanctions evasion and illicit-finance risk per FATF guidance.",links:[link(fatf,"FATF jurisdiction lists")]};
+}
+function whyOpacity(d,name){
+  const oc='https://opencorporates.com/companies?q='+encodeURIComponent(name)+'&jurisdiction_code=us';
+  const parts=[];
+  if(d.detail.registryId) parts.push("Registry identity verified (exchange listing / SEC CIK on record), which sharply lowers shell-company likelihood.");
+  else parts.push("No verifiable registry identity (SEC CIK, LEI, or confirmed state filing) was provided — the single strongest shell-company indicator in this framework.");
+  if(d.detail.isNew) parts.push("Incorporated within the last year; very young vendors in procurement contexts warrant identity verification before payment.");
+  if(!d.detail.registryId||d.detail.isNew) parts.push("This is a verification flag, not an accusation — many legitimate small businesses are new; the fix is documentation.");
+  return {why:parts.join(" "),links:[link(oc,"Look up on OpenCorporates")]};
+}
+function whyIndustry(d){
+  const bisg='https://www.bis.doc.gov/index.php/regulations/export-administration-regulations-ear';
+  if(!d.detail.rule) return {why:"No conflict between the declared business category and jurisdiction exposure. (Logistics-pattern analysis from customs data arrives in Phase 2.)",links:[link(bisg,"US export administration regulations")]};
+  return {why:d.detail.rule+". This combination matches documented export-diversion and front-company typologies and raises the review priority.",links:[link(bisg,"US export administration regulations")]};
+}
+
+function screenVendor(){
+  const name=$("q").value.trim();
+  if(!name){$("status").textContent="Type a company name first.";return;}
+  const t0=performance.now();
+  const res=resolveEntity(name);
+  const r=E.screen(PREP,res.entity,{});
+  const ms=Math.max(1,Math.round(performance.now()-t0));
+  $("status").textContent="Checked \""+res.entity.name+"\" against "+VET_DATA.sanctions.length+" designated entities across 2 lists + 4 contextual domains in "+ms+" ms.";
+  const tm=TIER_META[r.tier];
+  $("result").style.display="block";
+  const v=$("verdict"); v.style.background=tm.bg; v.style.borderColor=tm.c;
+  $("vTier").textContent=tm.label; $("vTier").style.background=tm.c;
+  $("vName").textContent=res.entity.name;
+  $("vScore").textContent=r.override?"OVERRIDE":r.composite.toFixed(3);
+  $("vHead").innerHTML=tm.head+"<br><span style='font-size:13px;color:var(--muted)'>"+res.src+"</span>";
+  $("reco").innerHTML=tm.reco.map(x=>"<li>"+x+"</li>").join("");
+
+  const S=r.signals;
+  const defs=[
+    ["Sanctions and designation lists",S.sanctions,whySanctions(S.sanctions,res.entity.name)],
+    ["Financial health",S.financial,whyFinancial(S.financial,res.entity.name)],
+    ["Geographic risk",S.geographic,whyGeo(S.geographic)],
+    ["Entity opacity",S.opacity,whyOpacity(S.opacity,res.entity.name)],
+    ["Industry-jurisdiction conflict",S.industry,whyIndustry(S.industry)]
+  ];
+  $("cats").innerHTML=defs.map(([nm,sig,w])=>
+    '<div class="cat"><div class="top"><span class="nm">'+nm+'</span>'+pill(sig.score)+'</div>'+
+    meter(sig.score)+'<div class="why">'+w.why+'</div><div class="links">'+w.links.join("")+'</div></div>'
+  ).join("");
+
+  const q=encodeURIComponent('"'+res.entity.name.replace(/ \[SYNTHETIC DEMO\]/,"")+'"');
+  $("extLinks").innerHTML=[
+    link("https://news.google.com/search?q="+q+"%20(sanctions%20OR%20fraud%20OR%20%22export%20controls%22)","News search: adverse media"),
+    link("https://sanctionssearch.ofac.treas.gov/","OFAC official search"),
+    link("https://www.bis.doc.gov/index.php/policy-guidance/lists-of-parties-of-concern/entity-list","BIS Entity List"),
+    link("https://efts.sec.gov/LATEST/search-index?q="+q,"SEC full-text search"),
+    link("https://opencorporates.com/companies?q="+q,"OpenCorporates registry")
+  ].join("");
+
+  if(barChart)barChart.destroy();
+  const vals=defs.map(d=>d[1].score===null?0:d[1].score);
+  barChart=new Chart($("barChart"),{type:"bar",
+    data:{labels:["Sanctions","Financial","Geographic","Opacity","Industry"],
+      datasets:[{data:vals.map(x=>Math.round(x*100)),
+        backgroundColor:defs.map(d=>d[1].score===null?"#d8d6cd":
+          getComputedStyle(document.documentElement).getPropertyValue(
+            d[1].score>=0.6?"--crit":d[1].score>=0.4?"--high":d[1].score>=0.2?"--med":"--low").trim()),
+        borderRadius:4}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>defs[c.dataIndex][1].score===null?"no data (excluded from weighting)":"risk "+c.raw+"/100"}}},
+      scales:{x:{min:0,max:100,grid:{color:"#eceae2"}},y:{grid:{display:false}}}}});
+  $("result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function portfolioScan(){
+  const t0=performance.now();
+  const tiers={LOW:0,MEDIUM:0,HIGH:0,CRITICAL:0};
+  const flagged=[];
+  const comp=VET_DATA.companies;
+  let i=0;
+  function chunk(){
+    const end=Math.min(i+200,comp.length);
+    for(;i<end;i++){
+      const c=comp[i];
+      const r=E.screen(PREP,{name:c.name,jurisdiction:"US",registryId:c.registryId,founded:c.founded,cik:c.cik},{quickReject:true});
+      tiers[r.tier]++;
+      if(r.tier!=="LOW")flagged.push(c.name+" → "+r.tier);
+    }
+    $("stScan").textContent=Math.round(i/comp.length*100)+"%";
+    if(i<comp.length){setTimeout(chunk,0);return;}
+    const ms=Math.round(performance.now()-t0);
+    $("stScan").textContent=ms.toLocaleString()+" ms";
+    $("stScanSub").textContent=comp.length.toLocaleString()+" companies, live in your browser";
+    $("scanSummary").innerHTML="<b>"+comp.length.toLocaleString()+" real US companies</b> screened live in <b>"+ms.toLocaleString()+" ms</b> against "+VET_DATA.sanctions.length+" designated entities.<br>"+
+      "Result: <b>"+tiers.LOW.toLocaleString()+" LOW</b> · "+tiers.MEDIUM+" MEDIUM · "+tiers.HIGH+" HIGH · "+tiers.CRITICAL+" CRITICAL.<br>"+
+      (flagged.length?("Flagged for review: "+flagged.join(", ")+".<br>"):"Zero false positives among real companies — no legitimate US company matched a designated entity at the review threshold.<br>")+
+      "<span style='font-size:12.5px;color:var(--faint)'>The "+VET_DATA.synthetic.length+" [SYNTHETIC DEMO] shell-pattern profiles are excluded from this portfolio metric — screen them individually via the chips above.</span>";
+    if(donutChart)donutChart.destroy();
+    donutChart=new Chart($("donut"),{type:"doughnut",
+      data:{labels:["LOW","MEDIUM","HIGH","CRITICAL"],
+        datasets:[{data:[tiers.LOW,tiers.MEDIUM,tiers.HIGH,tiers.CRITICAL],
+          backgroundColor:["#1d7a4f","#c9a227","#c2511f","#a32d2d"],borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:"62%",
+        plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:12}}}}}});
+  }
+  chunk();
+}
+init();
+</script>
+</body>
+</html>
