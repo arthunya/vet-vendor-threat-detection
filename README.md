@@ -155,7 +155,8 @@ vet-vendor-threat-detection/
 │
 ├── dashboard/
 │   ├── VET_Dashboard.html         # Self-contained interactive dashboard (open directly)
-│   ├── engine.js                  # JS port of the risk engine (9 Node tests)
+│   ├── engine.js                  # JS port of the risk engine
+│   ├── engine.test.js             # 10 Node tests for the JS engine (E1-E10)
 │   ├── app.py                     # Streamlit alternative viewer
 │   └── vet_dashboard_template.html # Pre-data-injection template
 │
@@ -246,9 +247,10 @@ Full endpoint reference: start the API and open `http://127.0.0.1:8000/docs` (au
 `dashboard/VET_Dashboard.html` — a single self-contained file (open directly in any browser, no server needed; **or view it live via GitHub Pages** — see Live Demo below). This is a supplementary demonstration layer built on top of the verified Phase-1 engine, not a replacement for it:
 
 - **1,261 real US companies** (S&P 500 + NASDAQ-listed small/mid caps, built from public datasets by `scripts/build_company_db.py`) and **68 real designated entities** (curated OFAC SDN / BIS Entity List subset).
-- The screening step is **real computation, not simulation**: the JS port of the risk engine (`dashboard/engine.js`, verified against 9 Node test cases) runs fuzzy + affiliate-containment sanctions matching and the 5-domain weighted ensemble live in the browser. A full-database scan (~1,261 companies) completes in ~100-300 ms with zero false positives.
+- The screening step is **real computation, not simulation**: the JS port of the risk engine (`dashboard/engine.js`, verified by 10 Node test cases in `dashboard/engine.test.js`) runs fuzzy + affiliate-containment sanctions matching and the 5-domain weighted ensemble live in the browser. A full-database scan (~1,261 companies) completes in ~100-300 ms with zero false positives.
 - Per-domain dashboard cards explain **why** a vendor is risky or clean, with verification links (OFAC search, BIS list, SEC EDGAR, OpenCorporates, adverse-media news search) and tier-specific business recommendations.
 - Shell-company fraud patterns are demonstrated ONLY via clearly labeled `[SYNTHETIC DEMO]` profiles — real companies are never assigned fraud labels without public evidence.
+- The demo screens a curated 68-record designation subset, so a clean result is labeled as such and is never presented as a sanctions clearance; custom entities with no jurisdiction provided have the geographic domain excluded rather than assumed, and BIS Entity List matches carry export-control guidance distinct from OFAC SDN matches.
 - This dashboard is being actively iterated on; expect incremental commits refining coverage, UI, and evidence-chain presentation.
 
 Rebuild: `python scripts/build_company_db.py && python scripts/assemble_dashboard.py`
