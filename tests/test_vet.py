@@ -10,6 +10,8 @@ Covers the claims the White Paper makes:
   T6  out-of-coverage financial data returns None, never a fake score
   T7  audit_log is append-only (UPDATE/DELETE rejected)
   T8  API contract: /screen, /runs/{id}/evidence round-trip with evidence
+  T9  affiliate-style name variant is still flagged for human review
+  T10 affiliate containment produces no false positive on clean names
 """
 from __future__ import annotations
 

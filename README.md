@@ -43,7 +43,7 @@ This is an active research project, not a one-time upload. Development continues
 | Component | Status |
 |---|---|
 | Data ingestion, entity graph, 5-feature deterministic risk engine | **Built & verified** (this repo) |
-| REST API, audit log, evaluation harness, 8-test verification suite | **Built & verified** (this repo) |
+| REST API, audit log, evaluation harness, 10-test verification suite | **Built & verified** (this repo) |
 | Interactive browser dashboard (`dashboard/VET_Dashboard.html`) | **Built — supplementary layer, under active refinement** |
 | Trained ML ensemble (XGBoost + GraphSAGE) | **Phase 2 — not yet started** (White Paper §3.3, §4.2) |
 | Expanded benchmark (500 entities incl. hard negatives) | **Phase 2 — planned** (tracked in `eval/`) |
@@ -54,8 +54,8 @@ This repository is the **Phase-1 deterministic ensemble** (White Paper §3.3, §
 
 - **Is:** a runnable end-to-end system — ingestion, entity graph, 5-feature risk engine, REST API, interactive dashboard, evaluation harness, append-only audit log.
 - **Is:** validated on **benchmark v0: 33 real entities** with publicly citable ground truth (OFAC/BIS designations vs. major SEC registrants). Current result: precision 1.0 / recall 1.0 — expected on this sanity-tier benchmark, since direct list membership is near-deterministic. The scientifically meaningful test is benchmark v1 (500 entities incl. shell structures and near-name hard negatives), tracked in `eval/`.
-- **Is not:** the trained ML ensemble (XGBoost + GraphSAGE). Training a classifier on a benchmark this small would overfit; the ML layer is Phase 2, exactly as scoped in the paper.
-- The financial-health module (`vet/features/financial_health.py`) was independently validated against live SEC EDGAR filings on June 30, 2026 — see White Paper §4.4 ("Financial Health Signal — Completed Validation") and Exhibit A-2c for full methodology, including a deliberately disclosed false-positive case (§6.5).
+- **Is not:** the trained ML ensemble (XGBoost + GraphSAGE). Training a classifier on a benchmark this small would overfit. The White Paper's Phase 1 plan (§4.1) includes an XGBoost baseline trained on a 5,000-entity benchmark; because benchmark v0 currently has 33 entities, this repository deliberately defers the trained ML layer from the original Phase 1 plan to Phase 2 and implements a deterministic weighted ensemble in its place.
+- The financial-health module (`vet/features/financial_health.py`) was validated against live SEC EDGAR filings on June 30, 2026 — see White Paper §4.4 ("Financial Health Signal — Completed Validation") and the accompanying validation report for full methodology, including a deliberately disclosed false-positive case (§6.5).
 - One record in the seed data is synthetic and loudly labeled as such (`DEMO Trading Partners LLC [SYNTHETIC TEST FIXTURE]`) — it exists only to unit-test hop-1 ownership propagation and is excluded from all metrics.
 
 ---
@@ -143,7 +143,7 @@ vet-vendor-threat-detection/
 │   └── postgres_schema.sql        # Production DDL
 │
 ├── tests/
-│   └── test_vet.py                # 8-test verification suite (T1-T8)
+│   └── test_vet.py                # 10-test verification suite (T1-T10)
 │
 ├── eval/
 │   ├── run_eval.py                # Recomputes precision/recall from scratch
@@ -181,7 +181,7 @@ pip install -r requirements.txt
 
 ```bash
 python -m vet.ingest.seed_data        # offline: hand-verified real records
-python -m pytest tests/ -q            # 8 tests
+python -m pytest tests/ -q            # 10 tests
 ```
 
 ```bash
@@ -325,10 +325,10 @@ This implementation accompanies the following working paper:
 
 **Arthunya Kanoklertwongse**
 M.S. Computer Science (AI Concentration) — Westcliff University, San Francisco
-MSc Financial Technology (Merit, academic merit scholarship) — University of the West of England, Bristol
-14 years: Financial analysis · Vendor risk management · Enterprise operations
+MSc Financial Technology (Merit; partial merit scholarship) — University of the West of England, Bristol
+14 years: Financial analysis · Internal audit · Cross-border counterparty coordination
 
-**Background:** The V.E.T. framework draws on 14 years of practitioner experience in financial analysis and vendor risk management — translated into a machine-learnable architecture through graduate-level AI research. The feature engineering design reflects analytical heuristics developed through years of professional experience in financial services and enterprise vendor evaluation.
+**Background:** The V.E.T. framework draws on 14 years of practitioner experience in financial analysis, internal audit, and cross-border counterparty coordination — translated into a machine-learnable architecture through graduate-level AI research. The feature engineering design reflects analytical heuristics developed through years of professional experience in financial services and multinational enterprise operations.
 
 ---
 
