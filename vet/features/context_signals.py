@@ -17,11 +17,15 @@ import sqlite3
 
 FATF_AS_OF = "2026-02 plenary snapshot — REFRESH BEFORE PRODUCTION USE"
 
-# Call-for-action ("black list") + comprehensively sanctioned jurisdictions.
+# FATF call-for-action (IR, KP; MM under enhanced due diligence) plus
+# jurisdictions subject to broad US sanctions programs (SY, CU, RU, BY).
 HIGH_RISK_JURISDICTIONS = {"IR", "KP", "SY", "CU", "RU", "BY", "MM"}
 # Increased-monitoring ("grey list") snapshot — verify against fatf-gafi.org.
-GREY_LIST = {"DZ", "AO", "CI", "CD", "HT", "KE", "LB", "MC", "MZ",
-             "NA", "NP", "NG", "ZA", "SS", "VE", "VN", "YE", "LA", "BG"}
+# FATF February 2026 plenary list (22 jurisdictions; SY is also in the
+# high-risk set above): DZ AO BO BG CM CI CD HT KE KW LA LB MC NA NP PG SS SY
+# VE VN VG YE.
+GREY_LIST = {"DZ", "AO", "BO", "BG", "CM", "CI", "CD", "HT", "KE", "KW", "LA",
+             "LB", "MC", "NA", "NP", "PG", "SS", "SY", "VE", "VN", "VG", "YE"}
 
 DUAL_USE_NAICS_PREFIXES = ("3341", "3344", "3345", "3364", "3329")  # computers,
 # semiconductors, navigation/instruments, aerospace, ordnance-adjacent metalwork
@@ -32,7 +36,7 @@ def geographic_risk(jurisdiction: str | None, owner_jurisdictions: list[str]) ->
     all_j = {juris, *(j.upper() for j in owner_jurisdictions if j)}
     if all_j & HIGH_RISK_JURISDICTIONS:
         score, hit = 0.9, sorted(all_j & HIGH_RISK_JURISDICTIONS)
-        cat = "FATF call-for-action / comprehensively sanctioned"
+        cat = "FATF call-for-action or broad US sanctions-program jurisdiction"
     elif all_j & GREY_LIST:
         score, hit = 0.5, sorted(all_j & GREY_LIST)
         cat = "FATF increased monitoring (grey list)"

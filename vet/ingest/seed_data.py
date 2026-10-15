@@ -80,7 +80,7 @@ SEED_ENTITIES = [
     ("The Procter & Gamble Company", "US", "0000080424"),
     ("Johnson & Johnson", "US", "0000200406"),
     ("PepsiCo, Inc.", "US", "0000077476"),
-    # Known false-positive stressor from White Paper §6.5 (buyback-driven
+    # Known false-positive stressor from Working Paper §6.5 (buyback-driven
     # negative equity, financially healthy). Ground truth: LOW risk.
     ("Domino's Pizza, Inc.", "US", "0001286681"),
     # High-risk side registered as graph entities (names mirror listings)

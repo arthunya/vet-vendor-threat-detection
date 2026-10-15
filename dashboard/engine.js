@@ -10,8 +10,9 @@
   "use strict";
 
   const HIGH_J = new Set(["IR", "KP", "SY", "CU", "RU", "BY", "MM"]);
-  const GREY_J = new Set(["DZ", "AO", "CI", "CD", "HT", "KE", "LB", "MC", "MZ",
-    "NA", "NP", "NG", "ZA", "SS", "VE", "VN", "YE", "LA", "BG"]);
+  // FATF increased-monitoring list, February 2026 plenary (22 jurisdictions).
+  const GREY_J = new Set(["DZ", "AO", "BO", "BG", "CM", "CI", "CD", "HT", "KE",
+    "KW", "LA", "LB", "MC", "NA", "NP", "PG", "SS", "SY", "VE", "VN", "VG", "YE"]);
   const SUFFIX = new Set(["CO", "LTD", "INC", "CORP", "CORPORATION", "COMPANY",
     "LLC", "PLC", "OAO", "PAO", "OJSC", "PJSC", "AO", "OU", "GMBH", "SA", "AG",
     "PTE", "SDN", "BHD", "LIMITED", "INCORPORATED", "SYNTHETIC", "DEMO"]);
@@ -117,7 +118,7 @@
     if (!all.length) return { score: null, hits: [], cat: "No jurisdiction data provided" };
     const hiHits = all.filter(j => HIGH_J.has(j));
     if (hiHits.length) return { score: 0.9, hits: hiHits,
-      cat: "FATF call-for-action / comprehensively sanctioned jurisdiction" };
+      cat: "FATF call-for-action or broad US sanctions-program jurisdiction" };
     const gHits = all.filter(j => GREY_J.has(j));
     if (gHits.length) return { score: 0.5, hits: gHits,
       cat: "FATF increased-monitoring (grey list) jurisdiction" };

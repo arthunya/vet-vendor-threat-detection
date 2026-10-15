@@ -1,6 +1,6 @@
 """V.E.T. test suite.
 
-Covers the claims the White Paper makes:
+Covers the claims the Working Paper makes:
   T1  direct sanctions match -> CRITICAL override (engine §3.3)
   T2  fuzzy alias match still detected ("Huawei Technologies Ltd" variant)
   T3  hop-1 ownership propagation flags the synthetic shell fixture

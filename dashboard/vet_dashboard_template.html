@@ -159,7 +159,7 @@ a{color:var(--accent)}
 
   <footer>
     <h3>Methodology</h3>
-    <p>Every screening runs a five-domain weighted ensemble in your browser: sanctions proximity (exact, fuzzy ≥90%, and affiliate-containment matching with corporate-suffix normalization), financial health (SEC EDGAR shareholders'-equity-to-assets, cached validation values), geographic risk (FATF call-for-action and increased-monitoring lists, Feb 2026 snapshot), entity opacity (registry identity + incorporation age), and industry-jurisdiction conflict. Domains with no data are excluded and weights renormalized — the system never fabricates a score. A direct match to a designated entity forces CRITICAL regardless of the composite.</p>
+    <p>Every screening runs a five-domain weighted ensemble in your browser: sanctions proximity (exact, fuzzy ≥90%, and affiliate-containment matching with corporate-suffix normalization), financial health (SEC EDGAR shareholders'-equity-to-assets, cached validation values), geographic risk (FATF call-for-action and increased-monitoring lists, February 2026 plenary), entity opacity (registry identity + incorporation age), and industry-jurisdiction conflict. Domains with no data are excluded and weights renormalized — the system never fabricates a score. A direct match to a designated entity forces CRITICAL regardless of the composite.</p>
     <h3>Data integrity notes</h3>
     <p>Company records are real US companies from public datasets (S&amp;P 500 constituents; NASDAQ listed-securities snapshot). No real company is ever labeled fraudulent by this tool — HIGH/CRITICAL results reflect matches against public government designation lists or documented risk-pattern indicators requiring human review. Profiles tagged <b>[SYNTHETIC DEMO]</b> are fictitious and exist only to demonstrate shell-company pattern detection. The designated-entity set here is a curated demo subset of 68 real, publicly citable OFAC SDN and BIS Entity List records; the production ingester mirrors the full lists (~15,000+ records) daily.</p>
     <p>V.E.T. is a decision-support tool, not legal advice. Escalations should be reviewed by a qualified compliance professional. Framework: Kanoklertwongse (2026), working paper.</p>
@@ -183,7 +183,7 @@ const TIER_META = {
   CRITICAL:{c:"var(--crit)",bg:"var(--crit-bg)",label:"CRITICAL",head:"Do not transact. Direct match to an OFAC SDN-listed party — US persons are generally prohibited from dealing with it.",
     reco:["Stop all transactions and communications about new business.","Verify the exact designation at the official source links below.","Consult legal counsel; OFAC operates a compliance hotline for questions.","If funds or goods are already in motion, counsel may advise on blocking/reporting obligations."]}
 };
-const JURIS = [["US","United States"],["CA","Canada"],["GB","United Kingdom"],["DE","Germany"],["JP","Japan"],["TH","Thailand"],["SG","Singapore"],["HK","Hong Kong"],["AE","United Arab Emirates"],["VN","Vietnam"],["CN","China"],["IN","India"],["MX","Mexico"],["BR","Brazil"],["LB","Lebanon"],["NG","Nigeria"],["ZA","South Africa"],["RU","Russia"],["BY","Belarus"],["IR","Iran"],["KP","North Korea"],["SY","Syria"],["CU","Cuba"],["MM","Myanmar"]];
+const JURIS = [["US","United States"],["CA","Canada"],["GB","United Kingdom"],["DE","Germany"],["JP","Japan"],["TH","Thailand"],["SG","Singapore"],["HK","Hong Kong"],["AE","United Arab Emirates"],["VN","Vietnam"],["CN","China"],["IN","India"],["MX","Mexico"],["BR","Brazil"],["LB","Lebanon"],["KW","Kuwait"],["BO","Bolivia"],["CM","Cameroon"],["PG","Papua New Guinea"],["VG","Virgin Islands (UK)"],["NG","Nigeria"],["ZA","South Africa"],["RU","Russia"],["BY","Belarus"],["IR","Iran"],["KP","North Korea"],["SY","Syria"],["CU","Cuba"],["MM","Myanmar"]];
 
 const $ = id => document.getElementById(id);
 let barChart=null, donutChart=null;
@@ -267,7 +267,7 @@ function whyFinancial(d,name){
 function whyGeo(d){
   const fatf='https://www.fatf-gafi.org/en/publications/High-risk-and-other-monitored-jurisdictions.html';
   if(d.score===null) return {why:"No registration or beneficial-owner jurisdiction was provided for this entity, so this domain is excluded from weighting rather than assumed. Select the jurisdictions in the form above to score it.",links:[link(fatf,"FATF jurisdiction lists")]};
-  if(!d.detail.hits.length) return {why:"Registered and beneficially owned in jurisdictions with no FATF call-for-action or increased-monitoring listing (Feb 2026 snapshot).",links:[link(fatf,"FATF jurisdiction lists")]};
+  if(!d.detail.hits.length) return {why:"Registered and beneficially owned in jurisdictions with no FATF call-for-action or increased-monitoring listing (FATF February 2026 plenary).",links:[link(fatf,"FATF jurisdiction lists")]};
   return {why:d.detail.cat+": "+d.detail.hits.join(", ")+". Exposure through registration or beneficial ownership in these jurisdictions is a primary vector for sanctions evasion and illicit-finance risk per FATF guidance.",links:[link(fatf,"FATF jurisdiction lists")]};
 }
 function whyOpacity(d,name){

@@ -32,37 +32,38 @@ Current U.S. vendor vetting methodologies share three critical failures:
 
 The [2020 SolarWinds compromise](https://www.cisa.gov/news-events/cybersecurity-advisories/aa20-352a) demonstrated the scale of vendor risk: approximately 18,000 organizations downloaded the compromised update, and nine U.S. federal agencies were confirmed breached.
 
-**Policy alignment:** V.E.T. directly addresses requirements under [Executive Order 13873](https://www.federalregister.gov/documents/2019/05/17/2019-10538/securing-the-information-and-communications-technology-and-services-supply-chain) (ICT Supply Chain Security), [NIST SP 800-161 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final), and the [FinCEN Beneficial Ownership Information reporting framework](https://www.fincen.gov/boi) (90 FR 13688, March 26, 2025).
+**Policy alignment:** V.E.T. is aligned with requirements established under [Executive Order 13873](https://www.federalregister.gov/documents/2019/05/17/2019-10538/securing-the-information-and-communications-technology-and-services-supply-chain) (ICT Supply Chain Security), [NIST SP 800-161 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final), and the [FinCEN Beneficial Ownership Information reporting framework](https://www.fincen.gov/boi) (90 FR 13688, March 26, 2025).
 
 ---
 
 ## Project Status
 
-This is an active research project, not a one-time upload. Development continues alongside the accompanying White Paper:
+This is an active research project, not a one-time upload. Development continues alongside the accompanying Working Paper:
 
 | Component | Status |
 |---|---|
 | Data ingestion, entity graph, 5-feature deterministic risk engine | **Built & verified** (this repo) |
 | REST API, audit log, evaluation harness, 10-test verification suite | **Built & verified** (this repo) |
 | Interactive browser dashboard (`dashboard/VET_Dashboard.html`) | **Built — supplementary layer, under active refinement** |
-| Trained ML ensemble (XGBoost + GraphSAGE) | **Phase 2 — not yet started** (White Paper §3.3, §4.2) |
-| Expanded benchmark (500 entities incl. hard negatives) | **Phase 2 — planned** (tracked in `eval/`) |
+| Trained ML ensemble (XGBoost + GraphSAGE) | **Phase 2 — not yet started** (Working Paper §3.3, §4.2) |
+| Expanded benchmark (500 entities incl. hard negatives) | **Next step — planned** (tracked in `eval/`); the paper's plan is 5,000 entities in Phase 1 and 20,000 in Phase 2 (§4.1, §4.2) |
+| Corporate-registry (OpenCorporates) and U.S. import bill-of-lading connectors (§4.1) | **Not yet built** — Phase 1 currently ingests OFAC SDN, BIS Entity List seed records, and SEC EDGAR |
 
 ## Honest Scope Statement
 
-This repository is the **Phase-1 deterministic ensemble** (White Paper §3.3, §4.1, §4.4). What it is and is not:
+This repository is the **Phase-1 deterministic ensemble** (Working Paper §3.3, §4.1, §4.4). What it is and is not:
 
 - **Is:** a runnable end-to-end system — ingestion, entity graph, 5-feature risk engine, REST API, interactive dashboard, evaluation harness, append-only audit log.
 - **Is:** validated on **benchmark v0: 33 real entities** with publicly citable ground truth (OFAC/BIS designations vs. major SEC registrants). Current result: precision 1.0 / recall 1.0 — expected on this sanity-tier benchmark, since direct list membership is near-deterministic. The scientifically meaningful test is benchmark v1 (500 entities incl. shell structures and near-name hard negatives), tracked in `eval/`.
-- **Is not:** the trained ML ensemble (XGBoost + GraphSAGE). Training a classifier on a benchmark this small would overfit. The White Paper's Phase 1 plan (§4.1) includes an XGBoost baseline trained on a 5,000-entity benchmark; because benchmark v0 currently has 33 entities, this repository deliberately defers the trained ML layer from the original Phase 1 plan to Phase 2 and implements a deterministic weighted ensemble in its place.
-- The financial-health module (`vet/features/financial_health.py`) was validated against live SEC EDGAR filings on June 30, 2026 — see White Paper §4.4 ("Financial Health Signal — Completed Validation") and the accompanying validation report for full methodology, including a deliberately disclosed false-positive case (§6.5).
+- **Is not:** the trained ML ensemble (XGBoost + GraphSAGE). Training a classifier on a benchmark this small would overfit. The Working Paper's Phase 1 plan (§4.1) includes an XGBoost baseline trained on a 5,000-entity benchmark; because benchmark v0 currently has 33 entities, this repository deliberately defers the trained ML layer from the original Phase 1 plan to Phase 2 and implements a deterministic weighted ensemble in its place.
+- The financial-health module (`vet/features/financial_health.py`) was validated against live SEC EDGAR filings on June 30, 2026 — see Working Paper §4.4 ("Financial Health Signal — Completed Validation") and the accompanying validation report for full methodology, including a deliberately disclosed false-positive case (§6.5).
 - One record in the seed data is synthetic and loudly labeled as such (`DEMO Trading Partners LLC [SYNTHETIC TEST FIXTURE]`) — it exists only to unit-test hop-1 ownership propagation and is excluded from all metrics.
 
 ---
 
 ## Architecture
 
-### Target architecture (full research vision — White Paper §3.3)
+### Target architecture (full research vision — Working Paper §3.3)
 
 V.E.T.'s target design is a four-layer data fusion architecture:
 
@@ -238,7 +239,7 @@ Verified example response (captured from a live local run of this exact codebase
 }
 ```
 
-Every score returns a full evidence chain — no black-box output. Fields returning `score: null` mean the entity is outside that feature's data coverage and were excluded (not penalized) from the composite, per the out-of-coverage principle in White Paper §4.4.
+Every score returns a full evidence chain — no black-box output. Fields returning `score: null` mean the entity is outside that feature's data coverage and were excluded (not penalized) from the composite, per the out-of-coverage principle in Working Paper §4.4.
 
 Full endpoint reference: start the API and open `http://127.0.0.1:8000/docs` (auto-generated OpenAPI UI).
 
@@ -264,7 +265,7 @@ GitHub does not render HTML files inline. To view the dashboard without download
 
 ## Verify Independently
 
-1. `python -m pytest tests/ -q` — all claims in the test docstring map to White Paper sections.
+1. `python -m pytest tests/ -q` — all claims in the test docstring map to Working Paper sections.
 2. `PYTHONPATH=. python eval/run_eval.py` — recomputes precision/recall from scratch; compare with the committed `eval/results_latest.json`.
 3. Pick any HIGH/CRITICAL result and follow `evidence.url` (or `evidence.source`) to the official OFAC/BIS/SEC source.
 4. Every screening stores `model_version` = git commit hash: check out that commit and re-run to reproduce any historical score.
@@ -273,7 +274,7 @@ GitHub does not render HTML files inline. To view the dashboard without download
 
 ## Known Limitations (tracked)
 
-- Buyback-driven negative equity fires the raw f2 signal (White Paper §6.5, Domino's case). The ensemble weighting contains it — verified by test T5 — and the Phase-2 remediation is a free-cash-flow gate.
+- Buyback-driven negative equity fires the raw f2 signal (Working Paper §6.5, Domino's case). The ensemble weighting contains it — verified by test T5 — and the Phase-2 remediation is a free-cash-flow gate.
 - FATF lists in `context_signals.py` are a dated snapshot; refresh before any production run.
 - Benchmark v0 has no hard negatives yet; v1 adds them.
 - Dashboard sanctions subset (68 records) is curated for demonstration; the production ingester (`vet/ingest/ofac_sdn.py`) mirrors the full OFAC SDN list (~15,000+ records).
@@ -284,14 +285,14 @@ GitHub does not render HTML files inline. To view the dashboard without download
 
 V.E.T. integrates six primary data domains:
 
-| Domain | Source | Access |
-|--------|--------|--------|
-| Sanctions lists | OFAC SDN, BIS Entity List, CAATSA, UN SC | Public |
-| Corporate registries | OpenCorporates API, state registries, SEC EDGAR (CIK) | Public API |
-| Beneficial ownership | FinCEN BOI (per 90 FR 13688, March 2025) | Restricted — Phase 2 |
-| Financial health | SEC EDGAR XBRL CompanyFacts API | Public, no auth (**built & verified**) |
-| Logistics/shipping | CBP import records, maritime APIs | Public + Commercial — Phase 2 |
-| OSINT | Adverse media, domain registration | Public — Phase 2 |
+| Domain | Source | Access | Status in this repo |
+|--------|--------|--------|--------|
+| Sanctions lists | OFAC SDN, BIS Entity List, CAATSA, UN SC | Public | **Built:** OFAC SDN (live loader) and BIS Entity List (seed records). CAATSA and UN SC: schema-ready, not yet ingested |
+| Corporate registries | OpenCorporates API, state registries, SEC EDGAR (CIK) | Public API | **Built:** SEC CIK identity. OpenCorporates and state registries: not yet built |
+| Beneficial ownership | FinCEN BOI (per 90 FR 13688, March 2025) | Restricted | Not built — requires authorized access (Phase 2) |
+| Financial health | SEC EDGAR XBRL CompanyFacts API | Public, no auth | **Built & verified** |
+| Logistics/shipping | U.S. import bill-of-lading records, commercial maritime APIs | Public + Commercial | Not yet built |
+| OSINT | Adverse media, domain registration | Public | Not yet built (dashboard links to manual adverse-media search) |
 
 FinCEN BOI access is currently restricted to authorized government agencies and financial institutions. V.E.T.'s Phase-1 implementation operates on publicly accessible data only.
 
@@ -320,6 +321,7 @@ This implementation accompanies the following working paper:
 - **Published:** April 9, 2026
 - **SSRN:** https://ssrn.com/abstract=6667278
 - **SSRN Abstract ID:** 6667278 (posted May 8, 2026)
+- **Revised version:** October 2026 (corrections to citations, regulatory details, and author biography; system architecture unchanged)
 
 ---
 

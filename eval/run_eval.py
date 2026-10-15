@@ -5,7 +5,7 @@ Benchmark v0 (seed): 33 real entities.
     each label is a public, citable government designation.
   LOW-RISK ground truth (16): major SEC registrants with no sanctions
     exposure, including Domino's Pizza — the documented false-positive
-    stressor from White Paper §6.5 (negative equity, financially healthy).
+    stressor from Working Paper §6.5 (negative equity, financially healthy).
 The synthetic DEMO fixture is excluded from all metrics.
 
 Metric definitions:

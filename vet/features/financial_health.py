@@ -1,6 +1,6 @@
 """f2 — Financial health (SEC EDGAR XBRL CompanyFacts).
 
-Per White Paper §4.4 / §6.5: shareholders'-equity-to-assets ratio as a
+Per Working Paper §4.4 / §6.5: shareholders'-equity-to-assets ratio as a
 distress indicator, with the documented buyback-driven-negative-equity
 confound. Score mapping (distress score, higher = riskier):
   ratio >= 0.15        -> 0.0
@@ -12,7 +12,7 @@ confound. Score mapping (distress score, higher = riskier):
 Live mode queries https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json
 (free, no auth). Offline mode falls back to CACHE below — values recorded
 from the live validation run of 2026-06-30 documented in the validation report
-accompanying White Paper §4.4. Cached entries are marked mode="cached" in evidence.
+accompanying Working Paper §4.4. Cached entries are marked mode="cached" in evidence.
 """
 from __future__ import annotations
 

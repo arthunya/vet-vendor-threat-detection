@@ -4,12 +4,12 @@ Design decisions (documented for scientific review):
 1. Deterministic weighted ensemble, not a trained classifier. With a benchmark
    in the hundreds of records, a trained XGBoost model would overfit and be
    scientifically indefensible; a calibrated rule ensemble yields measurable,
-   reproducible precision. The White Paper's Phase 1 plan (§4.1) includes an
+   reproducible precision. The Working Paper's Phase 1 plan (§4.1) includes an
    XGBoost baseline; this implementation defers the trained ML ensemble
    (XGBoost + GraphSAGE, §3.3 / §4.2) to Phase 2 until a larger benchmark exists.
 2. Features returning score=None (no data coverage) are EXCLUDED and the
    remaining weights renormalized — an entity is never penalized or cleared
-   on data that does not exist (White Paper §4.4 out-of-coverage principle).
+   on data that does not exist (Working Paper §4.4 out-of-coverage principle).
 3. Hard override: a direct sanctions-list match is CRITICAL regardless of the
    composite — no weighting scheme may dilute a designated entity.
 4. model_version = git commit hash: every screening run is reproducible.
