@@ -11,8 +11,8 @@ confound. Score mapping (distress score, higher = riskier):
 
 Live mode queries https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json
 (free, no auth). Offline mode falls back to CACHE below — values recorded
-from the live validation run of 2026-06-30 documented in Exhibit A-2c of the
-White Paper. Cached entries are marked mode="cached" in evidence.
+from the live validation run of 2026-06-30 documented in the validation report
+accompanying White Paper §4.4. Cached entries are marked mode="cached" in evidence.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ import urllib.request
 EDGAR_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
 UA = "VET-Framework research contact-via-westcliff"
 
-# Values from the documented live validation (Exhibit A-2c, 2026-06-30).
+# Values from the documented live validation (validation report, 2026-06-30).
 CACHE: dict[str, dict] = {
     "0000320193": {"name": "Apple Inc.", "ratio": 0.21, "fy": "FY2025"},
     "0001286681": {"name": "Domino's Pizza, Inc.", "ratio": -2.27, "fy": "FY2025"},
@@ -87,7 +87,7 @@ def compute(cik: str | None, live: bool = True) -> dict:
                 "raw_value": {"equity_to_assets": c["ratio"], "fiscal_year": c["fy"],
                               "mode": "cached"},
                 "evidence": {"source": "SEC_EDGAR", "mode": "cached",
-                             "provenance": "live validation 2026-06-30, Exhibit A-2c",
+                             "provenance": "live validation 2026-06-30, validation report",
                              "url": EDGAR_URL.format(cik=cik10)}}
     return {**base, "score": None,
             "raw_value": {"coverage": "none", "mode": "offline, not in cache"},

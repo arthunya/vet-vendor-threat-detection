@@ -4,8 +4,9 @@ Design decisions (documented for scientific review):
 1. Deterministic weighted ensemble, not a trained classifier. With a benchmark
    in the hundreds of records, a trained XGBoost model would overfit and be
    scientifically indefensible; a calibrated rule ensemble yields measurable,
-   reproducible precision. The ML ensemble (XGBoost + GraphSAGE) is Phase 2,
-   exactly as scoped in White Paper §3.3 / §4.2.
+   reproducible precision. The White Paper's Phase 1 plan (§4.1) includes an
+   XGBoost baseline; this implementation defers the trained ML ensemble
+   (XGBoost + GraphSAGE, §3.3 / §4.2) to Phase 2 until a larger benchmark exists.
 2. Features returning score=None (no data coverage) are EXCLUDED and the
    remaining weights renormalized — an entity is never penalized or cleared
    on data that does not exist (White Paper §4.4 out-of-coverage principle).
