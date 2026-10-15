@@ -114,6 +114,7 @@
 
   function geoRisk(juris, ownerJuris) {
     const all = [juris, ownerJuris].filter(Boolean).map(x => x.toUpperCase());
+    if (!all.length) return { score: null, hits: [], cat: "No jurisdiction data provided" };
     const hiHits = all.filter(j => HIGH_J.has(j));
     if (hiHits.length) return { score: 0.9, hits: hiHits,
       cat: "FATF call-for-action / comprehensively sanctioned jurisdiction" };

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>V.E.T. — Vendor Entity Threat Detection</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>')</script>
 <style>
 :root{
   --ink:#191917; --muted:#6b6a63; --faint:#8f8e86; --page:#f7f6f2;
@@ -173,13 +174,13 @@ const VET_DATA = /*__VET_DATA__*/;
 const E = VET_ENGINE;
 const PREP = E.prepSanctions(VET_DATA.sanctions);
 const TIER_META = {
-  LOW:{c:"var(--low)",bg:"var(--low-bg)",label:"LOW",head:"No adverse findings. Standard onboarding can proceed.",
-    reco:["Proceed with the engagement under normal terms.","Keep standard onboarding documents (W-9, insurance, references) on file.","Re-screen automatically on each sanctions-list update (production mode) or at least quarterly."]},
+  LOW:{c:"var(--low)",bg:"var(--low-bg)",label:"LOW",head:"No adverse findings in this demo screening.",
+    reco:["Before onboarding, re-confirm the name against the full official lists (OFAC Sanctions List Search and the Consolidated Screening List) — this demo screens a curated 68-record subset only.","If the full-list check is clean, proceed under normal terms and keep standard onboarding documents (W-9, insurance, references) on file.","Re-screen automatically on each sanctions-list update (production mode) or at least quarterly."]},
   MEDIUM:{c:"var(--med)",bg:"var(--med-bg)",label:"MEDIUM",head:"Proceed with enhanced due diligence — one or more signals warrant verification.",
     reco:["Request certificate of incorporation and beneficial-ownership declaration before first payment.","Verify the registry identity at the state Secretary of State or OpenCorporates.","Start with limited exposure (small first order, shorter payment terms).","Document this review — it is your compliance evidence."]},
   HIGH:{c:"var(--high)",bg:"var(--high-bg)",label:"HIGH",head:"Hold. A designation-list linkage or high-risk pattern was found — human review required before any contract or payment.",
     reco:["Do not sign or pay until a person has reviewed the evidence below.","Check the matched name directly at the official OFAC / BIS links.","Request full ownership chain documentation from the vendor.","If the linkage is confirmed, decline the engagement and record the decision."]},
-  CRITICAL:{c:"var(--crit)",bg:"var(--crit-bg)",label:"CRITICAL",head:"Do not transact. Direct match to a designated entity — dealings may violate US sanctions or export-control law.",
+  CRITICAL:{c:"var(--crit)",bg:"var(--crit-bg)",label:"CRITICAL",head:"Do not transact. Direct match to an OFAC SDN-listed party — US persons are generally prohibited from dealing with it.",
     reco:["Stop all transactions and communications about new business.","Verify the exact designation at the official source links below.","Consult legal counsel; OFAC operates a compliance hotline for questions.","If funds or goods are already in motion, counsel may advise on blocking/reporting obligations."]}
 };
 const JURIS = [["US","United States"],["CA","Canada"],["GB","United Kingdom"],["DE","Germany"],["JP","Japan"],["TH","Thailand"],["SG","Singapore"],["HK","Hong Kong"],["AE","United Arab Emirates"],["VN","Vietnam"],["CN","China"],["IN","India"],["MX","Mexico"],["BR","Brazil"],["LB","Lebanon"],["NG","Nigeria"],["ZA","South Africa"],["RU","Russia"],["BY","Belarus"],["IR","Iran"],["KP","North Korea"],["SY","Syria"],["CU","Cuba"],["MM","Myanmar"]];
@@ -199,8 +200,9 @@ function init(){
   dl.appendChild(frag);
   for(const id of ["fJuris","fOwner"]){
     const sel=$(id);
+    {const o=document.createElement("option");o.value="";o.textContent="Unknown / not provided";sel.appendChild(o);}
     for(const [code,nm] of JURIS){const o=document.createElement("option");o.value=code;o.textContent=nm+" ("+code+")";sel.appendChild(o);}
-    sel.value="US";
+    sel.value="";
   }
   const chips=["FedEx","Domino's","Huawei Technologies (Thailand) Co., Ltd.","PMC Wagner","Meridian Global Trade LLC [SYNTHETIC DEMO]","Ironwood Supply Chain LLC [SYNTHETIC DEMO]"];
   for(const c of chips){const b=document.createElement("span");b.className="chip";b.textContent=c;
@@ -224,7 +226,7 @@ function resolveEntity(name){
   return {entity:{name:name.trim(),jurisdiction:$("fJuris").value,ownerJurisdiction:$("fOwner").value,
     founded:$("fFounded").value?+$("fFounded").value:null,registryId:$("fRegistry").checked,
     naics:$("fNaics").value||null},
-    src:"Custom entity — attributes from the form above (unverified in this demo)"};
+    src:"Custom entity — attributes from the form above (unverified in this demo)", custom:true};
 }
 
 function scoreColor(s){return s>=0.6?"var(--crit)":s>=0.4?"var(--high)":s>=0.2?"var(--med)":"var(--low)";}
@@ -246,7 +248,7 @@ function whySanctions(d,name){
     links:[link(base,"OFAC sanctions search"),link(bis,"BIS Entity List")]};
   const listName=ev.list==="OFAC_SDN"?"OFAC SDN list":"BIS Entity List";
   let why;
-  if(d.detail.direct) why="Exact match to \""+ev.matched+"\" on the "+listName+" ("+ev.program+", designated "+ev.year+"). "+(ev.note?ev.note+". ":"")+"US persons are generally prohibited from transacting with SDN-listed parties; Entity List parties face export restrictions.";
+  if(d.detail.direct) why="Exact match to \""+ev.matched+"\" on the "+listName+" ("+ev.program+", designated "+ev.year+"). "+(ev.note?ev.note+". ":"")+(ev.list==="OFAC_SDN"?"US persons are generally prohibited from dealing with SDN-listed parties, and their property subject to US jurisdiction is blocked.":"Entity List designation imposes a license requirement on exports, reexports, and in-country transfers of items subject to the EAR to this party; it is not by itself a blanket prohibition on all transactions.");
   else if(ev.kind==="affiliate-containment") why="The vendor's name fully contains \""+ev.matched+"\" — a party on the "+listName+" ("+ev.program+", "+ev.year+"). This is the classic subsidiary/affiliate naming pattern; many affiliates of listed parents are themselves listed or restricted. Routed to human review rather than auto-blocked.";
   else why="Close fuzzy match ("+ev.kind+") to \""+ev.matched+"\" on the "+listName+" ("+ev.program+", "+ev.year+"). Could be the same entity under a name variant — verify at the official source.";
   return {why,links:[link(base,"OFAC sanctions search"),link(bis,"BIS Entity List")]};
@@ -264,6 +266,7 @@ function whyFinancial(d,name){
 }
 function whyGeo(d){
   const fatf='https://www.fatf-gafi.org/en/publications/High-risk-and-other-monitored-jurisdictions.html';
+  if(d.score===null) return {why:"No registration or beneficial-owner jurisdiction was provided for this entity, so this domain is excluded from weighting rather than assumed. Select the jurisdictions in the form above to score it.",links:[link(fatf,"FATF jurisdiction lists")]};
   if(!d.detail.hits.length) return {why:"Registered and beneficially owned in jurisdictions with no FATF call-for-action or increased-monitoring listing (Feb 2026 snapshot).",links:[link(fatf,"FATF jurisdiction lists")]};
   return {why:d.detail.cat+": "+d.detail.hits.join(", ")+". Exposure through registration or beneficial ownership in these jurisdictions is a primary vector for sanctions evasion and illicit-finance risk per FATF guidance.",links:[link(fatf,"FATF jurisdiction lists")]};
 }
@@ -291,13 +294,22 @@ function screenVendor(){
   const ms=Math.max(1,Math.round(performance.now()-t0));
   $("status").textContent="Checked \""+res.entity.name+"\" against "+VET_DATA.sanctions.length+" designated entities across 2 lists + 4 contextual domains in "+ms+" ms.";
   const tm=TIER_META[r.tier];
+  let head=tm.head, reco=tm.reco;
+  const sev=r.signals.sanctions.detail.ev;
+  if(r.override && sev && sev.list!=="OFAC_SDN"){
+    head="Export-control restriction. Direct match to a party on the BIS Entity List — a license is required for exports, reexports, and transfers of items subject to the EAR.";
+    reco=["Do not ship, export, or transfer items subject to the EAR to this party without confirming the license requirement.","Check the party's exact entry and license review policy on the Entity List (15 CFR Part 744, Supp. 4).","Check whether the party also appears on other US lists (e.g., OFAC SDN) via the Consolidated Screening List.","Consult export-control counsel before proceeding with any engagement."];
+  }
+  if(r.tier==="LOW" && res.custom){
+    head="No match in this demo's curated 68-record designation subset — this is not a sanctions clearance.";
+  }
   $("result").style.display="block";
   const v=$("verdict"); v.style.background=tm.bg; v.style.borderColor=tm.c;
   $("vTier").textContent=tm.label; $("vTier").style.background=tm.c;
   $("vName").textContent=res.entity.name;
   $("vScore").textContent=r.override?"OVERRIDE":r.composite.toFixed(3);
-  $("vHead").innerHTML=tm.head+"<br><span style='font-size:13px;color:var(--muted)'>"+res.src+"</span>";
-  $("reco").innerHTML=tm.reco.map(x=>"<li>"+x+"</li>").join("");
+  $("vHead").innerHTML=head+"<br><span style='font-size:13px;color:var(--muted)'>"+res.src+"</span>";
+  $("reco").innerHTML=reco.map(x=>"<li>"+x+"</li>").join("");
 
   const S=r.signals;
   const defs=[
@@ -322,6 +334,7 @@ function screenVendor(){
   ].join("");
 
   if(barChart)barChart.destroy();
+  if(window.Chart){
   const vals=defs.map(d=>d[1].score===null?0:d[1].score);
   barChart=new Chart($("barChart"),{type:"bar",
     data:{labels:["Sanctions","Financial","Geographic","Opacity","Industry"],
@@ -333,6 +346,7 @@ function screenVendor(){
     options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>defs[c.dataIndex][1].score===null?"no data (excluded from weighting)":"risk "+c.raw+"/100"}}},
       scales:{x:{min:0,max:100,grid:{color:"#eceae2"}},y:{grid:{display:false}}}}});
+  }
   $("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -360,7 +374,7 @@ function portfolioScan(){
       (flagged.length?("Flagged for review: "+flagged.join(", ")+".<br>"):"Zero false positives among real companies — no legitimate US company matched a designated entity at the review threshold.<br>")+
       "<span style='font-size:12.5px;color:var(--faint)'>The "+VET_DATA.synthetic.length+" [SYNTHETIC DEMO] shell-pattern profiles are excluded from this portfolio metric — screen them individually via the chips above.</span>";
     if(donutChart)donutChart.destroy();
-    donutChart=new Chart($("donut"),{type:"doughnut",
+    if(window.Chart) donutChart=new Chart($("donut"),{type:"doughnut",
       data:{labels:["LOW","MEDIUM","HIGH","CRITICAL"],
         datasets:[{data:[tiers.LOW,tiers.MEDIUM,tiers.HIGH,tiers.CRITICAL],
           backgroundColor:["#1d7a4f","#c9a227","#c2511f","#a32d2d"],borderWidth:0}]},

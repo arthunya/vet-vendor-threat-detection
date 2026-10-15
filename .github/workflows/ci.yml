@@ -11,5 +11,6 @@ jobs:
       - run: python -m vet.ingest.seed_data
       - run: python -m pytest tests/ -q
       - run: PYTHONPATH=. python eval/run_eval.py
+      - run: node --test dashboard/engine.test.js
       - uses: actions/upload-artifact@v4
         with: {name: eval-results, path: eval/results_latest.json}
